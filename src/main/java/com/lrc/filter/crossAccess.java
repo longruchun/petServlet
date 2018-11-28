@@ -9,6 +9,8 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.annotation.WebFilter;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 
 public class crossAccess implements Filter {
@@ -20,9 +22,24 @@ public class crossAccess implements Filter {
 	}
 
 	@Override
-	public void doFilter(ServletRequest arg0, ServletResponse arg1, FilterChain arg2)
+	public void doFilter(ServletRequest req, ServletResponse res, FilterChain filterchain)
 			throws IOException, ServletException {
-		// TODO Auto-generated method stub
+		HttpServletRequest request=(HttpServletRequest)req;
+		HttpServletResponse response=(HttpServletResponse)res;
+		
+		String origin = request.getHeader("Origin");
+        response.setHeader("Access-Control-Allow-Origin", origin);
+        response.setHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE");
+        response.setHeader("Access-Control-Max-Age", "3600");
+        response.setHeader("Access-Control-Allow-Headers", "x-requested-with,Authorization");
+        response.setHeader("Access-Control-Allow-Credentials", "true");
+        String method = request.getMethod();
+        if(method.equalsIgnoreCase("OPTIONS")){
+            res.getOutputStream().write("Success".getBytes("utf-8"));
+        }else{
+            filterchain.doFilter(req, res);
+        }
+		
 		
 	}
 
